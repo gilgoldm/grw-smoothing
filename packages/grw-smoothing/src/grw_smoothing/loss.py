@@ -4,10 +4,12 @@ import random
 
 import numpy as np
 import torch
+# noinspection PyPep8Naming
 import torch.nn.functional as F
 from torch import nn, Tensor
 
 
+# noinspection PyPep8Naming
 class GrwSmoothingLoss(nn.Module):
     def __init__(self, T: int, alpha: float = 0.5, max_perms: int = 1000):
         super().__init__()
