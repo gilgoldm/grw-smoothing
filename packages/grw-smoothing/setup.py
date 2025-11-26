@@ -1,4 +1,8 @@
+# packages/grw-smoothing/setup.py
 from setuptools import setup, find_packages
+from pathlib import Path
+
+README = Path(__file__).with_name("README.md").read_text(encoding="utf-8")
 
 setup(
     name="grw-smoothing",
@@ -6,20 +10,19 @@ setup(
     author="Gil Goldman",
     author_email="gilgoldm@gmail.com",
     description="Functional implementation of GRW-smoothing loss",
-    long_description=open('README.md').read(),
+    long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/gilgoldm/grw-smoothing",
 
-    # Finds the 'grw_smoothing' package directory automatically
-    packages=find_packages(exclude=("configs", "notebooks", "scripts", "tests")),
+    # Use src/ layout
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
 
-    # --- Minimal Core Requirements ---
-    # Only the dependencies needed to import and use the grw_smoothing functional
+    # Minimal runtime deps only
     install_requires=[
         "numpy",
         "torch>=2.3.0",
     ],
-    # --- End of Requirements ---
 
     classifiers=[
         "Programming Language :: Python :: 3",

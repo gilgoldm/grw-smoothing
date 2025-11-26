@@ -1,12 +1,13 @@
-import math
 from unittest import TestCase
 import unittest
 
 import torch
 from torch import Tensor
 
-from grw_smoothing.loss import GrwSmoothingLoss
+from grw_smoothing import GrwSmoothingLoss
 
+
+# noinspection PyPep8Naming
 class TestContrastiveLoss(TestCase):
 
 
