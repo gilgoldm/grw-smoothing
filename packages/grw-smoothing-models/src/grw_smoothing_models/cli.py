@@ -76,6 +76,7 @@ def kinetics_test(model_name: str,
                   backbone: str):
     from typing import Dict
     import torch
+    import torchvision.transforms as transforms
 
     from grw_smoothing_models.config.grw_smoothing_models_config import GrwSmoothingModelsConfig
     from grw_smoothing_models.model.attention import TransformerParams
@@ -91,18 +92,34 @@ def kinetics_test(model_name: str,
         from grw_smoothing_models.backbones.movinets.a0s.a0s_backbone import MovinetBackbone
         backbone_ = MovinetBackbone(embed_dim=transformer_params.embed_dim, max_drop_path_rate=0)
         ema_backbone = MovinetBackbone(embed_dim=transformer_params.embed_dim, max_drop_path_rate=0)
+        transform_test = transforms.Compose([
+            lambda v: v.to(torch.float32) / 255,
+            transforms.Resize((200, 200)),
+            transforms.CenterCrop(172)])
     elif backbone == 'movineta1s':
         from grw_smoothing_models.backbones.movinets.a1s.a1s_backbone import MovinetBackbone
         backbone_ = MovinetBackbone(embed_dim=transformer_params.embed_dim, max_drop_path_rate=0)
         ema_backbone = MovinetBackbone(embed_dim=transformer_params.embed_dim, max_drop_path_rate=0)
+        transform_test = transforms.Compose([
+            lambda v: v.to(torch.float32) / 255,
+            transforms.Resize((200, 200)),
+            transforms.CenterCrop(172)])
     elif backbone == 'movineta2s':
         from grw_smoothing_models.backbones.movinets.a2s.a2s_backbone import MovinetBackbone
         backbone_ = MovinetBackbone(embed_dim=transformer_params.embed_dim, max_drop_path_rate=0)
         ema_backbone = MovinetBackbone(embed_dim=transformer_params.embed_dim, max_drop_path_rate=0)
+        transform_test = transforms.Compose([
+            lambda v: v.to(torch.float32) / 255,
+            transforms.Resize((256, 256)),
+            transforms.CenterCrop(224)])
     elif backbone == 'movineta3b':
         from grw_smoothing_models.backbones.movinets.a3b.a3b_backbone import MovinetBackbone
         backbone_ = MovinetBackbone(embed_dim=transformer_params.embed_dim, max_drop_path_rate=0)
         ema_backbone = MovinetBackbone(embed_dim=transformer_params.embed_dim, max_drop_path_rate=0)
+        transform_test = transforms.Compose([
+            lambda v: v.to(torch.float32) / 255,
+            transforms.Resize((300, 300)),
+            transforms.CenterCrop(256)])
     else:
         raise Exception(f'backbone={backbone} unknown')
 
@@ -115,7 +132,8 @@ def kinetics_test(model_name: str,
          N=N,
          fps=fps,
          backbone=backbone_,
-         ema_backbone=ema_backbone)
+         ema_backbone=ema_backbone,
+         transform_test=transform_test)
 
 cli.add_command(kinetics_arrange)
 cli.add_command(kinetics_create_clips)
