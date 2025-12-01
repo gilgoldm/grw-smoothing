@@ -62,7 +62,7 @@ class ActionRecognitionModel(nn.Module):
     def load(model_path: str, video_backbone: VideoBackbone, dropout: float = 0., stochastic_depth: float = 0.,
              load_ema: bool = False, patch=None) \
             -> Tuple['ActionRecognitionModel', int]:
-        snapshot: Dict = torch.load(model_path, map_location='cpu', pickle_module=patch)
+        snapshot: Dict = torch.load(model_path, map_location='cpu', weights_only=False, pickle_module=patch)
         num_samples = snapshot['num_samples']
         transformer_params = snapshot['transformer_params']
         if snapshot['version'] == 10:
@@ -105,3 +105,74 @@ class ActionRecognitionModel(nn.Module):
         return new_model
 
 
+if __name__ == '__main__':
+    import os
+    import sys
+
+    from torch.optim.swa_utils import AveragedModel
+
+    from grw_smoothing_models.config.grw_smoothing_models_config import GrwSmoothingModelsConfig
+    from grw_smoothing_models.model.attention import TransformerParams
+    import grw_smoothing_models
+    import grw_smoothing_models.model.attention as new_attention_module
+
+    sys.modules['video_retrieval'] = grw_smoothing_models
+    sys.modules['video_retrieval.model.v10.attention'] = new_attention_module
+    sys.modules['video_retrieval.model.v10'] = new_attention_module
+
+    config = GrwSmoothingModelsConfig('../../../config.ini').config
+    models_home = config.get('global', 'models_home')
+
+
+    # import grw_smoothing_models.backbones.movinets.a0s.a0s_backbone as new_module
+    # import grw_smoothing_models.backbones.movinets.a0s as new_a0s_pkg
+    # from grw_smoothing_models.backbones.movinets.a0s.a0s_backbone import MovinetBackbone
+    # sys.modules['video_retrieval.backbones.movinets.a0s.a0s_backbone'] = new_module
+    # sys.modules['video_retrieval.backbones.movinets.a0s_v10'] = new_a0s_pkg
+    # sys.modules['video_retrieval.backbones.movinets.a0s_v10.movineta0s_v10_backbone'] = new_module
+    # model_name = 'a0s_v10_5011456.pt'
+
+    # import grw_smoothing_models.backbones.movinets.a1s.a1s_backbone as new_module
+    # import grw_smoothing_models.backbones.movinets.a1s as new_a1s_pkg
+    # from grw_smoothing_models.backbones.movinets.a1s.a1s_backbone import MovinetBackbone
+    # sys.modules['video_retrieval.backbones.movinets.a1s.a1s_backbone'] = new_module
+    # sys.modules['video_retrieval.backbones.movinets.a1s_v10'] = new_a1s_pkg
+    # sys.modules['video_retrieval.backbones.movinets.a1s_v10.movineta1s_v10_backbone'] = new_module
+    # model_name = 'a1s_v10_10049040.pt'
+
+    # import grw_smoothing_models.backbones.movinets.a2s.a2s_backbone as new_module
+    # import grw_smoothing_models.backbones.movinets.a2s as new_a2s_pkg
+    # from grw_smoothing_models.backbones.movinets.a2s.a2s_backbone import MovinetBackbone
+    # sys.modules['video_retrieval.backbones.movinets.a2s.a2s_backbone'] = new_module
+    # sys.modules['video_retrieval.backbones.movinets.a2s_v10'] = new_a2s_pkg
+    # sys.modules['video_retrieval.backbones.movinets.a2s_v10.movineta2s_v10_backbone'] = new_module
+    # model_name = 'a2s_v10_5203968.pt'
+
+    import grw_smoothing_models.backbones.movinets.a3b.a3b_backbone as new_module
+    import grw_smoothing_models.backbones.movinets.a3b as new_a3b_pkg
+    from grw_smoothing_models.backbones.movinets.a3b.a3b_backbone import MovinetBackbone
+    sys.modules['video_retrieval.backbones.movinets.a3b.a3b_backbone'] = new_module
+    sys.modules['video_retrieval.backbones.movinets.a3b_v10'] = new_a3b_pkg
+    sys.modules['video_retrieval.backbones.movinets.a3b_v10.movineta3b_v10_backbone'] = new_module
+    model_name = 'a3b_v10_15455232.pt'
+
+
+    model_path = str(os.path.join(models_home, model_name))
+    snapshot: Dict = torch.load(model_path, map_location='cpu', weights_only=False)
+    transformer_params: TransformerParams = snapshot['transformer_params']
+    backbone = MovinetBackbone(embed_dim=transformer_params.embed_dim, max_drop_path_rate=0)
+
+    model, num_samples = ActionRecognitionModel.load(model_path=model_path,
+                                                     video_backbone=backbone,
+                                                     dropout=0,
+                                                     stochastic_depth=0,
+                                                     load_ema=False)
+
+    backbone = MovinetBackbone(embed_dim=transformer_params.embed_dim, max_drop_path_rate=0)
+    ema_model, _ = ActionRecognitionModel.load(model_path=model_path,
+                                                     video_backbone=backbone,
+                                                     dropout=0,
+                                                     stochastic_depth=0,
+                                                     load_ema=True)
+    ema_model: AveragedModel = AveragedModel(model=ema_model, use_buffers=True)
+    model.save(model_path + '.new', num_samples, ema_weights=ema_model.state_dict())
