@@ -1,0 +1,17 @@
+# <repo>/pyproject.toml  (root)
+[project]
+name = "grw-workspace"
+version = "0.0.0"
+requires-python = ">=3.10"
+dependencies = [
+  "grw-smoothing",
+  "grw-smoothing-models",
+]
+
+[tool.uv.workspace]
+members = ["packages/grw-smoothing", "packages/grw-smoothing-models"]
+
+# Tell uv to satisfy these deps from the local workspace members (editable)
+[tool.uv.sources]
+grw-smoothing   = { workspace = true }
+grw-smoothing-models = { workspace = true }
