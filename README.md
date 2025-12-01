@@ -9,7 +9,7 @@ GRW-smoothing is a plug-and-play regularization technique for video recognition 
 ## Illustration of GRW-smoothing
 
 <p align="center">
-  <img src="grw-smoothing.png" alt="Warm-up airplane example: embeddings with and without GRW-smoothing" width="1000">
+  <img src="grw-smoothing.png" alt="Warm-up airplane example: embeddings with and without GRW-smoothing" width="2500">
 </p>
 
 **Figure:** Warm‑up airplanes dataset: three classes (yaw, pitch, roll) that are indistinguishable from a single frame. Without GRW‑smoothing, frame embeddings are scattered; with GRW‑smoothing, they form smooth, low‑acceleration trajectories that align with the underlying rotation type.
