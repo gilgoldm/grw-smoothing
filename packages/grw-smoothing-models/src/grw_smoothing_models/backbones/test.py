@@ -36,7 +36,8 @@ def main(model_name: str,
          num_workers: int,
          split: str,
          backbone: VideoBackbone,
-         ema_backbone: VideoBackbone):
+         ema_backbone: VideoBackbone,
+         transform_test):
     assert split in ['test', 'val']
     try:
         global_rank, local_rank = ddp_setup()
@@ -48,10 +49,6 @@ def main(model_name: str,
         torch.distributed.broadcast(tensor=seed, src=0)
         torch.manual_seed(seed.item())
         data_home, model_path = read_configurations(config, model_name)
-        transform_test = transforms.Compose([
-            lambda v: v.to(torch.float32) / 255,
-            transforms.Resize((200, 200)),
-            transforms.CenterCrop(172)])
         video_clips_pkl_name = split + '.pkl'
         ds = KineticsDs(root=data_home,
                         video_clips_pkl_name=video_clips_pkl_name,
