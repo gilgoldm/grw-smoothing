@@ -6,6 +6,46 @@ GRW-smoothing is a plug-and-play regularization technique for video recognition 
 
 ---
 
+## Installation
+
+This project includes two packages:
+
+- **`grw-smoothing`**: Contains only the loss term. Use this package if you want to use the GRW-smoothing loss in your own models but don't need the trained video models.
+- **`grw-smoothing-models`**: Includes the trained video models and has `grw-smoothing` as a dependency. Use this package if you want to use the pre-trained models.
+
+### Prerequisites
+
+1. **Install `uv`** (Python package installer):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+2. **Install Python >=3.10** and create a virtual environment:
+   ```bash
+   uv venv --python 3.11
+   ```
+
+3. **Activate the virtual environment**:
+   ```bash
+   source .venv/bin/activate
+   ```
+
+4. **Install PyTorch**:
+   ```bash
+   uv pip install torch torchvision
+   ```
+
+### Installing the packages
+
+To install both `grw-smoothing-models` (which includes `grw-smoothing` as a dependency):
+```bash
+uv sync
+```
+
+This will install both packages and all their dependencies.
+
+---
+
 ## Illustration of GRW-smoothing
 
 <p align="center">
